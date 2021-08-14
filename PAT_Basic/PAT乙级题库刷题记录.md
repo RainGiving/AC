@@ -3,7 +3,7 @@
 ## [1001 害死人不偿命的(3n+1)猜想 15分](https://pintia.cn/problem-sets/994805260223102976/problems/994805325918486528)  秒
 
 ```cpp
-#include<iostream>
+	#include<iostream>
 using namespace std;
 int n, ans;
 int main()
@@ -1564,4 +1564,178 @@ int main()
     return 0;
 }
 ```
+
+## [1028 人口普查 20分](https://pintia.cn/problem-sets/994805260223102976/problems/994805293282607104)
+
+### 第一次提交时忽略了输入无合法值则直接输出0的情况，导致一个测试点段错误
+
+```cpp
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+struct People
+{
+    string name;
+    int y;
+    int m;
+    int d;
+} peo[100010];
+
+bool cmp(struct People a, struct People b)
+{
+    if (a.y != b.y)
+        return a.y < b.y;
+    else if (a.m != b.m)
+        return a.m < b.m;
+    else
+        return a.d < b.d;
+}
+
+int main()
+{
+    int n, cnt = 0;
+    cin >> n;
+    string tmp_name;
+    int tmp_y, tmp_m, tmp_d;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> tmp_name;
+        scanf("%d/%d/%d", &tmp_y, &tmp_m, &tmp_d);
+        if (tmp_y < 1814 || 2014 < tmp_y)
+            continue;
+        else if (tmp_y == 1814 && tmp_m < 9 || tmp_y == 2014 && 9 < tmp_m)
+            continue;
+        else if (tmp_y == 1814 && tmp_m == 9 && tmp_d < 6 || tmp_y == 2014 && tmp_m == 9 && 6 < tmp_d)
+            continue;
+        else
+        {
+            peo[cnt].name = tmp_name;
+            peo[cnt].y = tmp_y;
+            peo[cnt].m = tmp_m;
+            peo[cnt].d = tmp_d;
+            cnt++;
+        }
+    }
+    sort(peo, peo + cnt, cmp);
+    if (cnt == 0)
+        cout << 0;
+    else
+        cout << cnt << " " << peo[0].name << " " << peo[cnt - 1].name;
+    return 0;
+}
+```
+
+## [1029 旧键盘 20分](https://pintia.cn/problem-sets/994805260223102976/problems/994805292322111488)
+
+### 第一次提交忽略了键盘全坏的情况，即输入的第二个字符串为空，要使用`getline`读入
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+string s1, s2;
+vector<char> bad;
+
+bool check(char c, vector<char> vc)
+{
+    for (int i = 0; i < vc.size(); i++)
+    {
+        if (c == vc[i] || ('a' <= c && c <= 'z' && c - ('a' - 'A') == vc[i]))
+            return false;
+    }
+    return true;
+}
+
+int main()
+{
+    getline(cin, s1);
+    getline(cin, s2);
+    int i = 0, j = 0;
+    while (i < s1.size())
+    {
+        if (s1[i] == s2[j])
+        {
+            i++;
+            j++;
+        }
+        else
+        {
+            if (check(s1[i], bad))
+            {
+                if ('a' <= s1[i] && s1[i] <= 'z')
+                    bad.push_back(s1[i] - ('a' - 'A'));
+                else
+                    bad.push_back(s1[i]);
+            }
+            i++;
+        }
+    }
+    for (int i = 0; i < bad.size(); i++)
+        cout << bad[i];
+    return 0;
+}
+```
+
+## [1030 完美数列 25分](https://pintia.cn/problem-sets/994805260223102976/problems/994805291311284224)
+
+ ### 计算`mp`时可能超出`int`表示范围，需要用`long long`，测试点5因此错误，1分
+
+### 超时的问题，参照一种反向的写法很棒，测试点4因此错误，3分
+
+AC做法
+
+```cpp
+for (int i = 0; i < n; i++)
+	for (int j = i + Max; j < n; j++)	//j直接从可能更新Max处开始，把起点后移
+    	if (num[j] <= num[i] * p)
+            Max = max(Max, j - i + 1);
+         else	//j在不可能更新Max后直接结束循环，把终点前移
+             break;
+```
+
+我一开始的做法（测试点4超时），原因可能是当`i`和`j`靠的很近时耗费时间较多
+
+```cpp
+for(int i = 0; i < n; i++)
+    for(int j = n - 1; i <= j; j--)
+        if(num[j] <= num[i] * p)
+        {
+            Max = max(Max, j - i + 1);
+            break;
+        }
+```
+
+完整代码
+
+```cpp
+#include <iostream>
+#include <algorithm>
+#define ll long long
+using namespace std;
+
+ll n, p, num[100005];
+
+int main()
+{
+    cin >> n >> p;
+    for (int i = 0; i < n; i++)
+        cin >> num[i];
+
+    sort(num, num + n);
+    int Max = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = i + Max; j < n; j++)
+            if (num[j] <= num[i] * p)
+                Max = max(Max, j - i + 1);
+            else
+                break;
+
+    cout << Max << endl;
+    return 0;
+}
+```
+
+
 
