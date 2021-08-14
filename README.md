@@ -21,7 +21,9 @@ void quick_sort(int q[], int l, int r)
 }
 ```
 
-[AcWing 785. 快速排序](https://www.acwing.com/problem/content/787/)	[AcWing 786. 第k个数](https://www.acwing.com/problem/content/788/)
+[AcWing 785. 快速排序](https://www.acwing.com/problem/content/787/)	
+
+[AcWing 786. 第k个数](https://www.acwing.com/problem/content/788/)
 
 ## 2. 归并排序
 
