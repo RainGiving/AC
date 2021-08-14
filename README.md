@@ -21,11 +21,33 @@ void quick_sort(int q[], int l, int r)
 }
 ```
 
-[AcWing 785. 快速排序](https://www.acwing.com/problem/content/787/)	
+[AcWing 785. 快速排序](https://www.acwing.com/problem/content/787/)----------AC代码
 
 [AcWing 786. 第k个数](https://www.acwing.com/problem/content/788/)
 
 ## 2. 归并排序
 
-确定数组的中点为分界点，递归对左右两部分进行归并排序，两边排序完成后再将两部分合并（当左右两边各有一个元素时左右两部分天然有序，此时直接`return`对这两个元素合并即可）
+确定数组的中点为分界点，递归对左右两部分进行归并排序，两边排序完成后再将两部分合并（当左右两边各有一个元素时左右两部分天然有序，此时直接对这两个元素合并即可）
+
+```cpp
+int tmp[N];	//临时存放合并得到数组
+void merge_sort(int q[], int l, int r)
+{
+    if(r <= l)	return;//只有一个元素，递归基
+    int mid = (l + r) >> 1;
+    merge_sort(q, l, mid), merge_sort(q, mid + 1, r);	//左右两边分别排序达到有序
+    int k = 0, i = 1, j = mid + 1;	//i是左边部分起点，j是右边部分起点
+    while(i <= mid && j <= r)
+        if(q[i] <= q[j]) tmp[k++] = q[i++];	//q[i]较小，则把q[i]放到tmp后面
+    	else 			 tmp[k++] = q[j++];	//同理
+    while(i <= mid) tmp[k++] = q[i++];	//如果左边部分没有全部放入tmp，则直接依次放到tmp后边
+    while(j <= r) 	tmp[k++] = q[j++];	//同理
+    for(int i = l, j = 0; i <= r; ++i, ++j)
+        q[i] = tmp[j];	//把tmp依次放回q
+}
+```
+
+[AcWing 787. 归并排序](https://www.acwing.com/problem/content/789/)
+
+[AcWing 788. 逆序对的数量](https://www.acwing.com/problem/content/790/)
 
