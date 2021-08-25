@@ -5,25 +5,15 @@ const int N = 100010;
 
 int q[N], n, cnt;
 
-bool check1(int mid, int k)   //bsearch1寻找左部右边界使用
-{
-    return q[mid] <= k;  //返回mid是否属于左部（以是否<=k区分左右）
-}
-
-bool check2(int mid, int k)   //bsearch2寻找右部左边界使用
-{
-    return !(q[mid] < k);    //返回mid是否属于右部（以是否<k区分左右）
-}
-
 int bsearch1(int l, int r, int k)
 {
     while(l < r)
     {
         int mid = (l + r + 1) >> 1;
-        if(check1(mid, k))  l = mid;
-        else                r = mid - 1;
+        if(q[mid] <= k) l = mid;
+        else            r = mid - 1;
     }
-    return (q[l] == k) ? l : -1;
+    return q[r] == k ? r : -1;
 }
 
 int bsearch2(int l, int r, int k)
@@ -31,10 +21,10 @@ int bsearch2(int l, int r, int k)
     while(l < r)
     {
         int mid = (l + r) >> 1;
-        if(check2(mid, k))  r = mid;
-        else                l = mid + 1;
+        if(k <= q[mid]) r = mid;
+        else            l = mid + 1;
     }
-    return (q[l] == k) ? l : -1;
+    return q[r] == k ? r : -1;
 }
 
 

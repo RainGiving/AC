@@ -1,11 +1,8 @@
 #include <iostream>
-
 using namespace std;
 
 const double eps = 1e-8;
-
 double n;
-
 
 double bsearch(double l, double r)
 {
@@ -17,7 +14,6 @@ double bsearch(double l, double r)
     }
     return l;
 }
-
 
 int main()
 {
