@@ -1,0 +1,210 @@
+# PAT (Basic Level) Practice （中文）**1003 我要通过！ (20 分)**
+
+“**答案正确**”是自动判题系统给出的最令人欢喜的回复。本题属于 PAT 的“**答案正确**”大派送 —— 只要读入的字符串满足下列条件，系统就输出“**答案正确**”，否则输出“**答案错误**”。
+
+得到“**答案正确**”的条件是：
+
+1. 字符串中必须仅有 `P`、 `A`、 `T`这三种字符，不可以包含其它字符；
+2. 任意形如 `xPATx` 的字符串都可以获得“**答案正确**”，其中 `x` 或者是空字符串，或者是仅由字母 `A` 组成的字符串；
+3. 如果 `aPbTc` 是正确的，那么 `aPbATca` 也是正确的，其中 `a`、 `b`、 `c` 均或者是空字符串，或者是仅由字母 `A` 组成的字符串。
+
+现在就请你为 PAT 写一个自动裁判程序，判定哪些字符串是可以获得“**答案正确**”的。
+
+### 输入格式：
+
+每个测试输入包含 1 个测试用例。第 1 行给出一个正整数 *n* (<10)，是需要检测的字符串个数。接下来每个字符串占一行，字符串长度不超过 100，且不包含空格。
+
+### 输出格式：
+
+每个字符串的检测结果占一行，如果该字符串可以获得“**答案正确**”，则输出 `YES`，否则输出 `NO`。
+
+### 输入样例：
+
+```in
+10
+PAT
+PAAT
+AAPATAA
+AAPAATAAAA
+xPATx
+PT
+Whatever
+APAAATAA
+APT
+APATTAA
+```
+
+### 输出样例：
+
+```out
+YES
+YES
+YES
+YES
+NO
+NO
+NO
+NO
+NO
+NO
+```
+
+## 思路1：按照题意模拟检查
+
+由题目的三个条件，得到一个基本结论是：这个字符串有且仅有一个`P`和`T`（且`P`一定在`T`的前面），而且其他的字符都是`A`（至少在`P`和`T`之间含有一个`A`）
+
+也就是说，只需要排除`P`和`T`的位置以及数量错误的情况以及其他字符存在的情况，后面只需要判断`A`的数量和位置是否合法即可
+
+```cpp
+//下面的程序用来排除P和T的位置以及数量错误的情况以及其他字符存在的情况
+//flag置为false表示该字符串不正确！
+bool flag = true, cnt_p = 0, cnt_t = 0, cnt_a = 0;
+for (int i = 0; i < s.size(); i++)
+{
+    if (s[i] == 'P')
+    {
+        P_index = i;	cnt_p++;
+    }
+    else if (s[i] == 'T')
+    {
+        T_index = i; 	cnt_t++;
+    }
+    else if(s[i] != 'A')
+    {
+        flag = false;
+        break;
+    }
+    else	cnt_a++;
+}
+if(cnt_p != 1 || cnt_t != 1 || T_index < P_index || cnt_a == 0)	flag = false;
+//只有flag为true的情况才进行下面步骤
+```
+
+我们设`P`之前的`A`字符数量为`k1`，`P`和`T`之间的`A`的字符数量为`k2`，`T`之后的`A`的字符数量为`k3`
+
+```cpp
+k1 = P_index;
+k2 = T_index - P_index - 1;
+k3 = s.size() - T.index - 1;
+```
+
+---
+
+> 2. 任意形如 `xPATx` 的字符串都可以获得“**答案正确**”，其中 `x` 或者是空字符串，或者是仅由字母 `A` 组成的字符串；
+
+从这个条件得出结论：当`k1 == k3 && k2 == 1`时，这个字符串合法
+
+（Tips：第一次做这道题的时候误以为前后两个`x`可以是不一样的，卡了半天........）
+
+> 3. 如果 `aPbTc` 是正确的，那么 `aPbATca` 也是正确的，其中 `a`、 `b`、 `c` 均或者是空字符串，或者是仅由字母 `A` 组成的字符串。
+
+这个条件翻译一下就是：如果`k1, k2, k3`是正确的，那么`k1, k2 + 1, k3 + k1`也是正确的
+
+倒过来讲，`k1, k2, k3`正确的前提是`k1, k2 - 1, k3 - k1`必须正确；
+
+因为只有到达条件2，`k2 == 1`时，我们才能断定字符串是否合法，所以执行
+
+```cpp
+while(1 < k2)
+{
+    k2--; k3 -= k1;
+}
+```
+
+再根据条件2判断
+
+```cpp
+if(!(k1 == k3 && 0 <= k3))	flag = false;
+```
+
+## 测试点问题
+
+- 测试点1 疑似是空字符串，所以不能用`cin`读入`s`，改用`getline(cin, s)`通过该点（注意在前面读取`n`之后加上`getchar()`，防止后面读入回车）
+- 测试点2 疑似是`T`在`P`前面的情况，不要忘了判断
+- 测试点3 疑似是`P`和`T`之间没有`A`的情况，不要忘了判断
+
+## 完整AC代码
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int n;
+
+int main()
+{
+    cin >> n;
+    getchar();
+    while(n--)
+    {
+        string s;
+        getline(cin, s);
+        int P_index, T_index, cnt_p = 0, cnt_t = 0;
+        bool flag = true;
+        
+        for (int i = 0; i < s.size(); i++)
+        {
+            if (s[i] == 'P')
+            {
+                P_index = i;	cnt_p++;
+            }
+            else if (s[i] == 'T')
+            {
+                T_index = i; 	cnt_t++;
+            }
+            else if(s[i] != 'A')    flag = false;
+        }
+        if(cnt_p != 1 || cnt_t != 1 || s[P_index + 1] != 'A' || !(P_index + 1 < T_index))	flag = false;   //排除 非1个P 非1个T T在P前 P和T之间没有A 的情况
+    
+        int k1 = P_index;
+        int k2 = T_index - P_index - 1;
+        int k3 = s.size() - T_index - 1;
+        while(1 < k2)
+        {
+            k2--; k3 -= k1;
+        }
+        if(k1 != k3 || k3 < 0)	flag = false;
+        if(flag)    cout << "YES" << endl;
+        else        cout << "NO" << endl;
+    }
+    return 0;
+}
+
+```
+
+## 思路2：找`k1, k2, k3`之间的规律，直接判断
+
+我们按照题目条件列出一系列答案正确的字符串，寻找规律
+
+```in
+左右各一个A
+PAT
+APATA
+APAATAA
+APAAATAAA
+...
+左右各两个A
+PAT
+AAPATAA
+AAPAATAAAA
+AAPAAATAAAAAA
+...
+```
+
+设一开始左右各有`x`个`A` `k1 = x, k2 = 1, k3 = x`
+
+根据条件三，一步步递推得到
+
+```in
+k1 = x	k2 = 2	k3 = 2x
+k1 = x 	k2 = 3	k3 = 3x
+k1 = x	k2 = 4	k3 = 4x
+```
+
+Conclusion：`k3 = k2 * k1`，则该字符串就是正确的（当然，前提条件要满足）
+
+## 总结
+
+PAT乙级字符串的题往往都是文字游戏，题目的每一条提示都是不能忽略，不涉及复杂的算法，但是需要考虑各种边界条件，找到规律之后比直接模拟在实现上要简单一些~
+
